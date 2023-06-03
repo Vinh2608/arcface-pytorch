@@ -13,6 +13,7 @@ import numpy as np
 import time
 from config import Config
 from torch.nn import DataParallel
+import cv2
 
 
 def get_lfw_list(pair_list):
@@ -32,6 +33,7 @@ def get_lfw_list(pair_list):
 
 def load_image(img_path):
     image = cv2.imread(img_path, 0)
+    image = cv2.resize(image, (128, 128)) #add this
     if image is None:
         return None
     image = np.dstack((image, np.fliplr(image)))
@@ -55,7 +57,7 @@ def get_featurs(model, test_list, batch_size=10):
         if images is None:
             images = image
         else:
-            images = np.concatenate((images, image), axis=0)
+          images = np.concatenate((images, image), axis=0)
 
         if images.shape[0] % batch_size == 0 or i == len(test_list) - 1:
             cnt += 1
@@ -144,7 +146,7 @@ def lfw_test(model, img_paths, identity_list, compair_list, batch_size):
     print('total time is {}, average time is {}'.format(t, t / cnt))
     fe_dict = get_feature_dict(identity_list, features)
     acc, th = test_performance(fe_dict, compair_list)
-    print('lfw face verification accuracy: ', acc, 'threshold: ', th)
+    print('VN-celeb face recognition accuracy: ', acc, 'threshold: ', th)
     return acc
 
 

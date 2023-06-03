@@ -2,7 +2,7 @@ class Config(object):
     env = 'default'
     backbone = 'resnet18'
     classify = 'softmax'
-    num_classes = 13938
+    num_classes = 716
     metric = 'arc_margin'
     easy_margin = False
     use_se = False
@@ -11,15 +11,15 @@ class Config(object):
     display = False
     finetune = False
 
-    train_root = '/data/Datasets/webface/CASIA-maxpy-clean-crop-144/'
-    train_list = '/data/Datasets/webface/train_data_13938.txt'
-    val_list = '/data/Datasets/webface/val_data_13938.txt'
+    train_root = '/content/arcface-pytorch/data/Datasets/VN-celeb1/train'
+    train_list = '/content/arcface-pytorch/data/Datasets/label_train.txt'
+    #val_list = '/data/Datasets/webface/val_data_13938.txt'
 
-    test_root = '/data1/Datasets/anti-spoofing/test/data_align_256'
-    test_list = 'test.txt'
+    #test_root = '/data1/Datasets/anti-spoofing/test/data_align_256'
+    #test_list = 'test.txt'
 
-    lfw_root = '/data/Datasets/lfw/lfw-align-128'
-    lfw_test_list = '/data/Datasets/lfw/lfw_test_pair.txt'
+    lfw_root = '/content/arcface-pytorch/data/Datasets/VN-celeb1/test'
+    lfw_test_list = '/content/arcface-pytorch/data/Datasets/pairs_new_test_VNCeleb.txt'
 
     checkpoints_path = 'checkpoints'
     load_model_path = 'models/resnet18.pth'
@@ -41,7 +41,7 @@ class Config(object):
     debug_file = '/tmp/debug'  # if os.path.exists(debug_file): enter ipdb
     result_file = 'result.csv'
 
-    max_epoch = 50
+    max_epoch = 5
     lr = 1e-1  # initial learning rate
     lr_step = 10
     lr_decay = 0.95  # when val_loss increase, lr = lr*lr_decay
