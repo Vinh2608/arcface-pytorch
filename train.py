@@ -19,7 +19,6 @@ from test import *
 from datetime import datetime
 
 
-
 def save_model(model, save_path, name, iter_cnt):
     save_name = os.path.join(save_path, name + '_' + str(iter_cnt) + '.pth')
     torch.save(model.state_dict(), save_name)
@@ -29,7 +28,7 @@ def save_model(model, save_path, name, iter_cnt):
 if __name__ == '__main__':
     runtime = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 
-    log_file = open(os.path.join('log', "%s_trace.txt"%runtime), "w", encoding="utf-8")
+    log_file = open(os.path.join('log', "%s_trace.txt" % runtime), "w", encoding="utf-8")
     log_file.write("epoch\ttest_acc\n")
 
     opt = Config()
@@ -38,19 +37,24 @@ if __name__ == '__main__':
     device = torch.device("cuda")
 
     train_transforms = T.Compose([
-            T.Grayscale(),
-            T.RandomCrop(opt.input_shape[1:]),
-            T.RandomHorizontalFlip(),
-            T.ToTensor(),
-            T.Normalize(mean=[0.5], std=[0.5]),
-        ])
+        T.Grayscale(),
+        T.RandomCrop(opt.input_shape[1:]),
+        T.RandomHorizontalFlip(),
+        T.ToTensor(),
+        T.Normalize(mean=[0.5], std=[0.5]),
+    ])
 
-    train_dataset = torchvision.datasets.ImageFolder(opt.train_root, transform = train_transforms)
+    train_dataset = torchvision.datasets.ImageFolder(opt.train_root, transform=train_transforms)
     # train_dataset = Dataset(opt.train_root, opt.train_list, phase='train', input_shape=opt.input_shape)
     trainloader = data.DataLoader(train_dataset,
                                   batch_size=opt.train_batch_size,
                                   shuffle=True,
                                   num_workers=opt.num_workers)
+    # train_dataset = Dataset(opt.train_root, opt.train_list, phase='train', input_shape=opt.input_shape)
+    # trainloader = data.DataLoader(train_dataset,
+    #                               batch_size=opt.train_batch_size,
+    #                               shuffle=True,
+    #                               num_workers=opt.num_workers)
 
     identity_list = get_lfw_list(opt.lfw_test_list)
     img_paths = [os.path.join(opt.lfw_root, each) for each in identity_list]
@@ -68,6 +72,24 @@ if __name__ == '__main__':
         model = resnet34()
     elif opt.backbone == 'resnet50':
         model = resnet50()
+
+    model_dict = model.state_dict()
+    pretrained_dict = torch.load(opt.test_model_path)
+    pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+    model_dict.update(pretrained_dict)
+    model.load_state_dict(model_dict)
+    print(model)
+
+    model.conv1.requires_grad = False
+    model.bn1.requires_grad_ = False
+    model.conv1.requires_grad = False
+    model.layer1.requires_grad = False
+    model.layer2.requires_grad = False
+    model.layer3.requires_grad = False
+    model.layer4.requires_grad = False
+    model.fc5.requires_grad = True
+    model.bn4.requires_grad = False
+    model.bn5.requires_grad = False
 
     if opt.metric == 'add_margin':
         metric_fc = AddMarginProduct(512, opt.num_classes, s=30, m=0.35)
@@ -120,7 +142,8 @@ if __name__ == '__main__':
                 acc = np.mean((output == label).astype(int))
                 speed = opt.print_freq / (time.time() - start)
                 time_str = time.asctime(time.localtime(time.time()))
-                print('{} train epoch {} iter {} {} iters/s loss {} acc {}'.format(time_str, i, ii, speed, loss.item(), acc))
+                print('{} train epoch {} iter {} {} iters/s loss {} acc {}'.format(time_str, i, ii, speed, loss.item(),
+                                                                                   acc))
                 if opt.display:
                     visualizer.display_current_results(iters, loss.item(), name='train_loss')
                     visualizer.display_current_results(iters, acc, name='train_acc')
@@ -133,6 +156,6 @@ if __name__ == '__main__':
         model.eval()
         acc = lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
         log_file.write("%s\t%.3f\n" \
-        %(i, acc))
+                       % (i, acc))
         if opt.display:
             visualizer.display_current_results(iters, acc, name='test_acc')
