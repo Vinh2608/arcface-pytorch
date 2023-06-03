@@ -133,6 +133,6 @@ if __name__ == '__main__':
         model.eval()
         acc = lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
         log_file.write("%s\t%.3f\n" \
-        %(epoch, acc))
+        %(i, acc))
         if opt.display:
             visualizer.display_current_results(iters, acc, name='test_acc')
