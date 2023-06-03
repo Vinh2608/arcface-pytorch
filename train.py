@@ -16,6 +16,8 @@ from config import Config
 from torch.nn import DataParallel
 from torch.optim.lr_scheduler import StepLR
 from test import *
+from datetime import datetime
+
 
 
 def save_model(model, save_path, name, iter_cnt):
@@ -25,13 +27,16 @@ def save_model(model, save_path, name, iter_cnt):
 
 
 if __name__ == '__main__':
+    runtime = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+
+    log_file = open(os.path.join('log', "%s_trace.txt"%runtime), "w", encoding="utf-8")
+    log_file.write("epoch\ttest_acc\n")
 
     opt = Config()
     if opt.display:
         visualizer = Visualizer()
     device = torch.device("cuda")
 
-    # if not added grayscale, the input shape is not right
     train_transforms = T.Compose([
             T.Grayscale(),
             T.RandomCrop(opt.input_shape[1:]),
@@ -39,14 +44,9 @@ if __name__ == '__main__':
             T.ToTensor(),
             T.Normalize(mean=[0.5], std=[0.5]),
         ])
-    # train_dataset = Dataset(opt.train_root, opt.train_list, phase='train', input_shape=opt.input_shape)
-    # trainloader = data.DataLoader(train_dataset,
-    #                               batch_size=opt.train_batch_size,
-    #                               shuffle=True,
-    #                               num_workers=opt.num_workers)
 
     train_dataset = torchvision.datasets.ImageFolder(opt.train_root, transform = train_transforms)
-    # # train_dataset = Dataset(opt.train_root, opt.train_list, phase='train', input_shape=opt.input_shape)
+    # train_dataset = Dataset(opt.train_root, opt.train_list, phase='train', input_shape=opt.input_shape)
     trainloader = data.DataLoader(train_dataset,
                                   batch_size=opt.train_batch_size,
                                   shuffle=True,
@@ -132,5 +132,7 @@ if __name__ == '__main__':
 
         model.eval()
         acc = lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
+        log_file.wriste("%s\t%.3f\n" \
+        %(epoch, acc))
         if opt.display:
             visualizer.display_current_results(iters, acc, name='test_acc')
