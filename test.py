@@ -159,6 +159,8 @@ if __name__ == '__main__':
         model = resnet34()
     elif opt.backbone == 'resnet50':
         model = resnet50()
+    elif opt.backbone == 'mobilefacenet':
+        model = MobileFaceNet(512).to(torch.device("cuda:0") if torch.cuda.is_available() else "cpu")
 
     model = DataParallel(model)
     # load_model(model, opt.test_model_path)

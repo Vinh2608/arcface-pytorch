@@ -72,6 +72,8 @@ if __name__ == '__main__':
         model = resnet34()
     elif opt.backbone == 'resnet50':
         model = resnet50()
+    elif opt.backbone == 'mobilefacenet':
+        model = MobileFaceNet(512).to(torch.device("cuda:0") if torch.cuda.is_available() else "cpu")
 
     model_dict = model.state_dict()
     pretrained_dict = torch.load(opt.test_model_path)
@@ -80,16 +82,16 @@ if __name__ == '__main__':
     model.load_state_dict(model_dict)
     print(model)
 
-    model.conv1.requires_grad = False
-    model.bn1.requires_grad_ = False
-    model.conv1.requires_grad = False
-    model.layer1.requires_grad = False
-    model.layer2.requires_grad = False
-    model.layer3.requires_grad = False
-    model.layer4.requires_grad = False
-    model.fc5.requires_grad = True
-    model.bn4.requires_grad = False
-    model.bn5.requires_grad = False
+    # model.conv1.requires_grad = False
+    # model.bn1.requires_grad_ = False
+    # model.conv1.requires_grad = False
+    # model.layer1.requires_grad = False
+    # model.layer2.requires_grad = False
+    # model.layer3.requires_grad = False
+    # model.layer4.requires_grad = False
+    # model.fc5.requires_grad = True
+    # model.bn4.requires_grad = False
+    # model.bn5.requires_grad = False
 
     if opt.metric == 'add_margin':
         metric_fc = AddMarginProduct(512, opt.num_classes, s=30, m=0.35)
