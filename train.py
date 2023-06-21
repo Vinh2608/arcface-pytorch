@@ -4,7 +4,7 @@ from data import Dataset
 import torch
 from torch.utils import data
 import torch.nn.functional as F
-from models import *
+from models.mobilefacenet import MobileFaceNet
 import torchvision
 from torchvision import transforms as T
 from utils import Visualizer, view_model
@@ -76,22 +76,23 @@ if __name__ == '__main__':
         model = MobileFaceNet(512).to(torch.device("cuda:0") if torch.cuda.is_available() else "cpu")
 
     model_dict = model.state_dict()
-    pretrained_dict = torch.load(opt.test_model_path)
+    pretrained_dict = torch.load(opt.load_model_path)
     pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
     model_dict.update(pretrained_dict)
     model.load_state_dict(model_dict)
     print(model)
 
-    # model.conv1.requires_grad = False
-    # model.bn1.requires_grad_ = False
-    # model.conv1.requires_grad = False
-    # model.layer1.requires_grad = False
-    # model.layer2.requires_grad = False
-    # model.layer3.requires_grad = False
-    # model.layer4.requires_grad = False
-    # model.fc5.requires_grad = True
-    # model.bn4.requires_grad = False
-    # model.bn5.requires_grad = False
+    model.conv1.requires_grad = False
+    model.conv2_dw.requires_grad_ = False
+    model.conv_23.requires_grad = False
+    model.conv_3.requires_grad = False
+    model.conv_34.requires_grad = False
+    model.conv_4.requires_grad = False
+    model.conv_45.requires_grad = False
+    model.conv_5.requires_grad = True
+    model.conv_6_dw.requires_grad = False
+    model.linear.requires_grad = True
+    model.bn.requires_grad = True
 
     if opt.metric == 'add_margin':
         metric_fc = AddMarginProduct(512, opt.num_classes, s=30, m=0.35)
@@ -118,7 +119,7 @@ if __name__ == '__main__':
     scheduler = StepLR(optimizer, step_size=opt.lr_step, gamma=0.1)
 
     start = time.time()
-    for i in range(opt.max_epoch):
+    for i in range(opt.max_epoch + 1):
         scheduler.step()
 
         model.train()
