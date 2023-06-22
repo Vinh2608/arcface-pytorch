@@ -88,15 +88,15 @@ if __name__ == '__main__':
     model.conv_34.requires_grad = False
     model.conv_4.requires_grad = False
     model.conv_45.requires_grad = False
-    model.conv_5.requires_grad = True
-    model.conv_6_dw.requires_grad = False
+    model.conv_5.requires_grad = False
+    model.conv_6_dw.requires_grad = True
     model.linear.requires_grad = True
     model.bn.requires_grad = True
 
     if opt.metric == 'add_margin':
         metric_fc = AddMarginProduct(512, opt.num_classes, s=30, m=0.35)
     elif opt.metric == 'arc_margin':
-        metric_fc = ArcMarginProduct(512, opt.num_classes, s=30, m=0.5, easy_margin=opt.easy_margin)
+        metric_fc = ArcMarginProduct(512, opt.num_classes, s=64, m=0.5, easy_margin=opt.easy_margin)
     elif opt.metric == 'sphere':
         metric_fc = SphereProduct(512, opt.num_classes, m=4)
     else:
