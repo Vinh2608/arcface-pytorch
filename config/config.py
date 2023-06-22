@@ -11,15 +11,15 @@ class Config(object):
     display = False
     finetune = False
 
-    train_root = '/content/arcface-pytorch/data/Datasets/VN-celeb1/train'
+    train_root = '/content/arcface-pytorch/data/Datasets/VN-celeb_align/train'
     train_list = '/content/arcface-pytorch/data/Datasets/label_train.txt'
     #val_list = '/data/Datasets/webface/val_data_13938.txt'
 
     #test_root = '/data1/Datasets/anti-spoofing/test/data_align_256'
     #test_list = 'test.txt'
 
-    lfw_root = '/content/arcface-pytorch/data/Datasets/VN-celeb1/test'
-    lfw_test_list = '/content/arcface-pytorch/data/Datasets/pairs_new_test_VNCeleb.txt'
+    lfw_root = '/content/arcface-pytorch/data/Datasets/VN-celeb_align/test'
+    lfw_test_list = '/content/arcface-pytorch/data/Datasets/pairs_new_test_VNCeleb_align.txt'
 
     checkpoints_path = 'checkpoints'
     load_model_path = 'checkpoints/mobilefacenet_10.pth'
