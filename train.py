@@ -37,7 +37,6 @@ if __name__ == '__main__':
     device = torch.device("cuda")
 
     train_transforms = T.Compose([
-        T.Grayscale(),
         T.RandomCrop(opt.input_shape[1:]),
         T.RandomHorizontalFlip(),
         T.ToTensor(),
