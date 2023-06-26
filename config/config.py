@@ -2,7 +2,7 @@ class Config(object):
     env = 'default'
     backbone = 'mobilefacenet'
     classify = 'softmax'
-    num_classes = 716
+    num_classes = 589
     metric = 'arc_margin'
     easy_margin = False
     use_se = False
