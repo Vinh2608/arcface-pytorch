@@ -39,6 +39,7 @@ def load_image(img_path):
     image = np.dstack((image, np.fliplr(image)))
     image = image.transpose((2, 0, 1))
     image = image[:, np.newaxis, :, :]
+    image = np.resize(image, (image.shape[0], 3, image.shape[2], image.shape[3]))
     image = image.astype(np.float32, copy=False)
     image -= 127.5
     image /= 127.5
