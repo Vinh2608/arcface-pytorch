@@ -93,10 +93,12 @@ if __name__ == '__main__':
     model.linear.requires_grad = True
     model.bn.requires_grad = True
 
+    s = 64
+    m = 0.2
     if opt.metric == 'add_margin':
-        metric_fc = AddMarginProduct(512, opt.num_classes, s=30, m=0.35)
+        metric_fc = AddMarginProduct(512, opt.num_classes, s=s, m=m)
     elif opt.metric == 'arc_margin':
-        metric_fc = ArcMarginProduct(512, opt.num_classes, s=64, m=0.2, easy_margin=opt.easy_margin)
+        metric_fc = ArcMarginProduct(512, opt.num_classes, s=s, m=m, easy_margin=opt.easy_margin)
     elif opt.metric == 'sphere':
         metric_fc = SphereProduct(512, opt.num_classes, m=4)
     else:
