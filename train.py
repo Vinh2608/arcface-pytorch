@@ -149,7 +149,7 @@ if __name__ == '__main__':
                 time_str = time.asctime(time.localtime(time.time()))
                 print('{} train epoch {} iter {} {} iters/s loss {} acc {}'.format(time_str, i, ii, speed, loss.item(),
                                                                                    acc))
-                log_file2.write('{} train epoch {} iter {} {} iters/s loss {} acc {}'.format(time_str, i, ii, speed, loss.item(),
+                log_file2.write('{} train epoch {} iter {} {} iters/s loss {} acc {}\n'.format(time_str, i, ii, speed, loss.item(),
                                                                                    acc))
                 if opt. display:
                     visualizer.display_current_results(iters, loss.item(), name='train_loss')
