@@ -28,8 +28,9 @@ def save_model(model, save_path, name, iter_cnt):
 if __name__ == '__main__':
     runtime = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 
-    log_file = open(os.path.join('log', "%s_trace.txt" % runtime), "w", encoding="utf-8")
-    log_file.write("epoch\ttest_acc\n")
+    log_file1 = open(os.path.join('log', "%s_trace_testing.txt" % runtime), "w", encoding="utf-8")
+    log_file1.write("epoch\ttest_acc\n")
+    log_file2 = open(os.path.join('log', "%s_trace_training.txt" % runtime), "w", encoding="utf-8")
 
     opt = Config()
     if opt.display:
@@ -148,18 +149,20 @@ if __name__ == '__main__':
                 time_str = time.asctime(time.localtime(time.time()))
                 print('{} train epoch {} iter {} {} iters/s loss {} acc {}'.format(time_str, i, ii, speed, loss.item(),
                                                                                    acc))
-                if opt.display:
+                log_file2.write('{} train epoch {} iter {} {} iters/s loss {} acc {}'.format(time_str, i, ii, speed, loss.item(),
+                                                                                   acc))
+                if opt. display:
                     visualizer.display_current_results(iters, loss.item(), name='train_loss')
                     visualizer.display_current_results(iters, acc, name='train_acc')
 
                 start = time.time()
 
         if i % opt.save_interval == 0 or i == opt.max_epoch:
-            save_model(model, opt.checkpoints_path, opt.backbone, i)
+            save_model(model, opt.checkpoints_path, opt.backbone + '_s=' + str(s) + '_m=' + str(m) , i)
 
         model.eval()
         acc = lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
-        log_file.write("%s\t%.3f\n" \
+        log_file1.write("%s\t%.3f\n" \
                        % (i, acc))
         if opt.display:
             visualizer.display_current_results(iters, acc, name='test_acc')
