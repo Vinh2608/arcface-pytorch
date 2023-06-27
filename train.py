@@ -23,7 +23,10 @@ def save_model(model, save_path, name, iter_cnt):
     save_name = os.path.join(save_path, name + '_' + str(iter_cnt) + '.pth')
     torch.save(model.state_dict(), save_name)
     return save_name
-
+def save_optimizer(optimizer, save_path, name, iter_cnt):
+    save_name = os.path.join(save_path, name + '_' + str(iter_cnt) + '.pth')
+    torch.save(optimizer.state_dict(), save_name)
+    return save_name
 
 if __name__ == '__main__':
     runtime = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
@@ -159,6 +162,7 @@ if __name__ == '__main__':
 
         if i % opt.save_interval == 0 or i == opt.max_epoch:
             save_model(model, opt.checkpoints_path, opt.backbone + '_s=' + str(s) + '_m=' + str(m) , i)
+            save_optimizer(model, opt.checkpoints_optimizer_path, opt.optimizer + '_s=' + str(s) + '_m=' + str(m) , i)
 
         model.eval()
         acc = lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
