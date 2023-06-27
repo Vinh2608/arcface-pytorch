@@ -41,7 +41,7 @@ class Config(object):
     debug_file = '/tmp/debug'  # if os.path.exists(debug_file): enter ipdb
     result_file = 'result.csv'
 
-    max_epoch = 20
+    max_epoch = 100
     lr = 1e-1  # initial learning rate
     lr_step = 10
     lr_decay = 0.95  # when val_loss increase, lr = lr*lr_decay
