@@ -22,6 +22,7 @@ class Config(object):
     lfw_test_list = '/content/arcface-pytorch/data/Datasets/pairs_new_test_VNCeleb_align.txt'
 
     checkpoints_path = 'checkpoints'
+    checkpoints_path = 'checkpoints_optimizer_path'
     load_model_path = 'checkpoints/mobilefacenet_10.pth'
     test_model_path = 'checkpoints/mobilefacenet_10.pth'
     save_interval = 10
