@@ -44,7 +44,7 @@ if __name__ == '__main__':
         T.RandomCrop(opt.input_shape[1:]),
         T.RandomHorizontalFlip(),
         T.ToTensor(),
-        T.Normalize(mean=[0.5], std=[0.5]),
+        T.Normalize(mean=[0.5,0.5,0.5], std=[0.5,0.5,0.5]),
     ])
 
     train_dataset = torchvision.datasets.ImageFolder(opt.train_root, transform=train_transforms)
@@ -121,6 +121,13 @@ if __name__ == '__main__':
     else:
         optimizer = torch.optim.Adam([{'params': model.parameters()}, {'params': metric_fc.parameters()}],
                                      lr=opt.lr, weight_decay=opt.weight_decay)
+    if opt.load_optimizer:  
+      optimizer_dict = optimizer.state_dict()
+      pretrained_optimizer_dict = torch.load(opt.checkpoints_optimizer_path)
+      pretrained_optimizer_dict = {k: v for k, v in pretrained_optimizer_dict.items() if k in optimizer_dict}
+      optimizer_dict.update(pretrained_optimizer_dict)
+      optimizer.load_state_dict(optimizer_dict)
+
     scheduler = StepLR(optimizer, step_size=opt.lr_step, gamma=0.1)
 
     start = time.time()
@@ -134,6 +141,7 @@ if __name__ == '__main__':
             label = label.to(device).long()
             feature = model(data_input)
             output = metric_fc(feature, label)
+            print("Debug:" , output.shape, label.shape)
             loss = criterion(output, label)
             optimizer.zero_grad()
             loss.backward()
