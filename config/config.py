@@ -10,6 +10,7 @@ class Config(object):
 
     display = False
     finetune = False
+    load_optimizer = False
 
     train_root = '/content/arcface-pytorch/data/Datasets/VN-celeb_align/train'
     train_list = '/content/arcface-pytorch/data/Datasets/label_train.txt'
