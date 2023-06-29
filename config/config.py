@@ -23,8 +23,8 @@ class Config(object):
 
     checkpoints_path = 'checkpoints'
     checkpoints_optimizer_path = 'checkpoints_optimizer_path'
-    load_model_path = 'checkpoints/mobilefacenet_10.pth'
-    test_model_path = 'checkpoints/mobilefacenet_10.pth'
+    load_model_path = 'checkpoints/mobilefacenet_90_589classes.pth'
+    test_model_path = 'checkpoints/mobilefacenet_90_589classes.pth'
     save_interval = 10
 
     train_batch_size = 16  # batch size
