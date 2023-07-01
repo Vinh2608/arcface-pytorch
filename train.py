@@ -171,7 +171,7 @@ if __name__ == '__main__':
 
         if i % opt.save_interval == 0 or i == opt.max_epoch:
             save_model(model, opt.checkpoints_path, opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) , i)
-            save_optimizer(model, opt.checkpoints_optimizer_path, opt.optimizer + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) , i)
+            save_optimizer(model, opt.checkpoints_optimizer_save_path, opt.optimizer + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) , i)
 
         model.eval()
         acc = lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
