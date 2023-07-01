@@ -23,13 +23,14 @@ class Config(object):
     lfw_test_list = '/content/arcface-pytorch/data/Datasets/pairs_new_test_VNCeleb_align.txt'
 
     checkpoints_path = 'checkpoints'
-    checkpoints_optimizer_path = 'checkpoints_optimizer_path'
-    load_model_path = 'checkpoints/mobilefacenet_90_589classes.pth'
-    test_model_path = 'checkpoints/mobilefacenet_90_589classes.pth'
+    checkpoints_optimizer_path = 'checkpoints_optimizer_path/sgd_s=72_m=0.2_60.pth'
+    checkpoints_optimizer_save_path = 'checkpoints_optimizer_path'
+    load_model_path = 'checkpoints/mobilefacenet_s=72_m=0.2_60.pth'
+    test_model_path = 'checkpoints/mobilefacenet_s=72_m=0.2_60.pth'
     save_interval = 10
 
-    train_batch_size = 16  # batch size
-    test_batch_size = 60
+    train_batch_size = 200  # batch size
+    test_batch_size = 100
 
     input_shape = (1, 128, 128)
 
