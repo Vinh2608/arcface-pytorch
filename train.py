@@ -23,6 +23,7 @@ def save_model(model, save_path, name, iter_cnt):
     save_name = os.path.join(save_path, name + '_' + str(iter_cnt) + '.pth')
     torch.save(model.state_dict(), save_name)
     return save_name
+
 def save_optimizer(optimizer, save_path, name, iter_cnt):
     save_name = os.path.join(save_path, name + '_' + str(iter_cnt) + '.pth')
     torch.save(optimizer.state_dict(), save_name)
@@ -30,12 +31,14 @@ def save_optimizer(optimizer, save_path, name, iter_cnt):
 
 if __name__ == '__main__':
     runtime = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-
-    log_file1 = open(os.path.join('log', "%s_trace_testing.txt" % runtime), "w", encoding="utf-8")
-    log_file1.write("epoch\ttest_acc\n")
-    log_file2 = open(os.path.join('log', "%s_trace_training.txt" % runtime), "w", encoding="utf-8")
-
+    s = 64
+    m = 0.2
     opt = Config()
+
+    log_file1 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "testing.txt"), "w", encoding="utf-8")
+    log_file1.write("epoch\ttest_acc\n")
+    log_file2 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "training.txt"), "w", encoding="utf-8")
+
     if opt.display:
         visualizer = Visualizer()
     device = torch.device("cuda")
@@ -97,8 +100,7 @@ if __name__ == '__main__':
     model.linear.requires_grad = True
     model.bn.requires_grad = True
 
-    s = 64
-    m = 0.2
+    
     if opt.metric == 'add_margin':
         metric_fc = AddMarginProduct(512, opt.num_classes, s=s, m=m)
     elif opt.metric == 'arc_margin':
@@ -141,7 +143,6 @@ if __name__ == '__main__':
             label = label.to(device).long()
             feature = model(data_input)
             output = metric_fc(feature, label)
-            print("Debug:" , output.shape, label.shape)
             loss = criterion(output, label)
             optimizer.zero_grad()
             loss.backward()
@@ -169,8 +170,8 @@ if __name__ == '__main__':
                 start = time.time()
 
         if i % opt.save_interval == 0 or i == opt.max_epoch:
-            save_model(model, opt.checkpoints_path, opt.backbone + '_s=' + str(s) + '_m=' + str(m) , i)
-            save_optimizer(model, opt.checkpoints_optimizer_path, opt.optimizer + '_s=' + str(s) + '_m=' + str(m) , i)
+            save_model(model, opt.checkpoints_path, opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) , i)
+            save_optimizer(model, opt.checkpoints_optimizer_path, opt.optimizer + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) , i)
 
         model.eval()
         acc = lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
