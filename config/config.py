@@ -2,7 +2,7 @@ class Config(object):
     env = 'default'
     backbone = 'mobilefacenet'
     classify = 'softmax'
-    num_classes = 589
+    num_classes = 580
     metric = 'arc_margin'
     easy_margin = False
     use_se = False
@@ -21,7 +21,7 @@ class Config(object):
     #test_list = 'test.txt'
 
     lfw_root = '/content/arcface-pytorch/data/Datasets/VN-celeb_align_frontal/test'
-    lfw_test_list = '/content/arcface-pytorch/data/Datasets/pairs_new_test_VNCeleb_align.txt'
+    lfw_test_list = '/content/arcface-pytorch/data/Datasets/pairs_new_test_VNCeleb_align_frontal.txt'
 
     checkpoints_path = 'checkpoints'
     checkpoints_optimizer_path = 'checkpoints_optimizer_path/sgd_s=72_m=0.2_60.pth'
