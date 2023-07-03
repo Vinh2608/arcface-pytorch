@@ -35,9 +35,9 @@ if __name__ == '__main__':
     m = 0.2
     opt = Config()
 
-    log_file1 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "testing.txt"), "w", encoding="utf-8")
+    log_file1 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_testing.txt"), "w", encoding="utf-8")
     log_file1.write("epoch\ttest_acc\n")
-    log_file2 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "training.txt"), "w", encoding="utf-8")
+    log_file2 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_training.txt"), "w", encoding="utf-8")
 
     if opt.display:
         visualizer = Visualizer()
@@ -81,12 +81,13 @@ if __name__ == '__main__':
     elif opt.backbone == 'mobilefacenet':
         model = MobileFaceNet(512).to(torch.device("cuda:0") if torch.cuda.is_available() else "cpu")
 
-    model_dict = model.state_dict()
-    pretrained_dict = torch.load(opt.load_model_path)
-    pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
-    model_dict.update(pretrained_dict)
-    model.load_state_dict(model_dict)
-    print(model)
+    if opt.load_model:
+      model_dict = model.state_dict()
+      pretrained_dict = torch.load(opt.load_model_path)
+      pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+      model_dict.update(pretrained_dict)
+      model.load_state_dict(model_dict)
+      print(model)
 
     model.conv1.requires_grad = False
     model.conv2_dw.requires_grad_ = False
@@ -170,8 +171,8 @@ if __name__ == '__main__':
                 start = time.time()
 
         if i % opt.save_interval == 0 or i == opt.max_epoch:
-            save_model(model, opt.checkpoints_path, opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) , i)
-            save_optimizer(model, opt.checkpoints_optimizer_save_path, opt.optimizer + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) , i)
+            save_model(model, opt.checkpoints_path, opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_", i)
+            save_optimizer(model, opt.checkpoints_optimizer_save_path, opt.optimizer + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_" , i)
 
         model.eval()
         acc = lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
@@ -179,3 +180,4 @@ if __name__ == '__main__':
                        % (i, acc))
         if opt.display:
             visualizer.display_current_results(iters, acc, name='test_acc')
+            
