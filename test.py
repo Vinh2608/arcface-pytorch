@@ -13,7 +13,6 @@ import numpy as np
 import time
 from config import Config
 from torch.nn import DataParallel
-import cv2
 
 
 def get_lfw_list(pair_list):
@@ -33,13 +32,11 @@ def get_lfw_list(pair_list):
 
 def load_image(img_path):
     image = cv2.imread(img_path, 0)
-    image = cv2.resize(image, (128, 128)) #add this
     if image is None:
         return None
     image = np.dstack((image, np.fliplr(image)))
     image = image.transpose((2, 0, 1))
     image = image[:, np.newaxis, :, :]
-    image = np.resize(image, (image.shape[0], 3, image.shape[2], image.shape[3]))
     image = image.astype(np.float32, copy=False)
     image -= 127.5
     image /= 127.5
@@ -58,7 +55,7 @@ def get_featurs(model, test_list, batch_size=10):
         if images is None:
             images = image
         else:
-          images = np.concatenate((images, image), axis=0)
+            images = np.concatenate((images, image), axis=0)
 
         if images.shape[0] % batch_size == 0 or i == len(test_list) - 1:
             cnt += 1
@@ -147,7 +144,7 @@ def lfw_test(model, img_paths, identity_list, compair_list, batch_size):
     print('total time is {}, average time is {}'.format(t, t / cnt))
     fe_dict = get_feature_dict(identity_list, features)
     acc, th = test_performance(fe_dict, compair_list)
-    print('VN-celeb face recognition accuracy: ', acc, 'threshold: ', th)
+    print('lfw face verification accuracy: ', acc, 'threshold: ', th)
     return acc
 
 
@@ -160,8 +157,6 @@ if __name__ == '__main__':
         model = resnet34()
     elif opt.backbone == 'resnet50':
         model = resnet50()
-    elif opt.backbone == 'mobilefacenet':
-        model = MobileFaceNet(512).to(torch.device("cuda:0") if torch.cuda.is_available() else "cpu")
 
     model = DataParallel(model)
     # load_model(model, opt.test_model_path)
@@ -173,7 +168,3 @@ if __name__ == '__main__':
 
     model.eval()
     lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
-
-
-
-
