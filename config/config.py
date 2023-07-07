@@ -20,7 +20,7 @@ class Config(object):
     #test_root = '/data1/Datasets/anti-spoofing/test/data_align_256'
     #test_list = 'test.txt'
 
-    lfw_root = '/content/lfw/lfw-align-128'
+    lfw_root = '/content/lfw-align-128'
     lfw_test_list = 'lfw_test_pair.txt'
 
     checkpoints_path = 'checkpoints'
