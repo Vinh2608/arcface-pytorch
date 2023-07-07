@@ -35,32 +35,21 @@ if __name__ == '__main__':
     m = 0.2
     opt = Config()
 
-    log_file1 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_testing.txt"), "w", encoding="utf-8")
+    log_file1 = open(os.path.join('log', opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_casia_testing.txt"), "w", encoding="utf-8")
     log_file1.write("epoch\ttest_acc\n")
-    log_file2 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_training.txt"), "w", encoding="utf-8")
+    log_file2 = open(os.path.join('log', opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "casia_training.txt"), "w", encoding="utf-8")
 
     if opt.display:
         visualizer = Visualizer()
     device = torch.device("cuda")
 
-    train_transforms = T.Compose([
-        T.RandomCrop(opt.input_shape[1:]),
-        T.RandomHorizontalFlip(),
-        T.ToTensor(),
-        T.Normalize(mean=[0.5,0.5,0.5], std=[0.5,0.5,0.5]),
-    ])
 
-    train_dataset = torchvision.datasets.ImageFolder(opt.train_root, transform=train_transforms)
-    # train_dataset = Dataset(opt.train_root, opt.train_list, phase='train', input_shape=opt.input_shape)
+    #train_dataset = torchvision.datasets.ImageFolder(opt.train_root, transform=train_transforms)
+    train_dataset = Dataset(opt.train_root, opt.train_list, phase='train', input_shape=opt.input_shape)
     trainloader = data.DataLoader(train_dataset,
                                   batch_size=opt.train_batch_size,
                                   shuffle=True,
                                   num_workers=opt.num_workers)
-    # train_dataset = Dataset(opt.train_root, opt.train_list, phase='train', input_shape=opt.input_shape)
-    # trainloader = data.DataLoader(train_dataset,
-    #                               batch_size=opt.train_batch_size,
-    #                               shuffle=True,
-    #                               num_workers=opt.num_workers)
 
     identity_list = get_lfw_list(opt.lfw_test_list)
     img_paths = [os.path.join(opt.lfw_root, each) for each in identity_list]
@@ -79,7 +68,7 @@ if __name__ == '__main__':
     elif opt.backbone == 'resnet50':
         model = resnet50()
     elif opt.backbone == 'mobilefacenet':
-        model = MobileFaceNet(512).to(torch.device("cuda:0") if torch.cuda.is_available() else "cpu")
+        model = MobileFaceNet(512)
 
     if opt.load_model:
       model_dict = model.state_dict()
@@ -88,18 +77,6 @@ if __name__ == '__main__':
       model_dict.update(pretrained_dict)
       model.load_state_dict(model_dict)
       print(model)
-
-    model.conv1.requires_grad = False
-    model.conv2_dw.requires_grad_ = False
-    model.conv_23.requires_grad = False
-    model.conv_3.requires_grad = False
-    model.conv_34.requires_grad = False
-    model.conv_4.requires_grad = False
-    model.conv_45.requires_grad = False
-    model.conv_5.requires_grad = False
-    model.conv_6_dw.requires_grad = True
-    model.linear.requires_grad = True
-    model.bn.requires_grad = True
 
     
     if opt.metric == 'add_margin':
