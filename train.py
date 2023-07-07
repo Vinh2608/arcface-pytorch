@@ -45,12 +45,20 @@ if __name__ == '__main__':
 
 
     #train_dataset = torchvision.datasets.ImageFolder(opt.train_root, transform=train_transforms)
-    train_dataset = Dataset(opt.train_root, opt.train_list, phase='train', input_shape=opt.input_shape)
+    # if not added grayscale, the input shape is not right
+    train_transforms = T.Compose([
+            T.Grayscale(), 
+            T.RandomCrop(opt.input_shape[1:]),
+            T.RandomHorizontalFlip(),
+            T.ToTensor(),
+            T.Normalize(mean=[0.5], std=[0.5]),
+        ])
+
+    train_dataset = torchvision.datasets.ImageFolder(opt.train_root, transform = train_transforms) 
     trainloader = data.DataLoader(train_dataset,
                                   batch_size=opt.train_batch_size,
                                   shuffle=True,
                                   num_workers=opt.num_workers)
-
     identity_list = get_lfw_list(opt.lfw_test_list)
     img_paths = [os.path.join(opt.lfw_root, each) for each in identity_list]
 
@@ -157,4 +165,3 @@ if __name__ == '__main__':
                        % (i, acc))
         if opt.display:
             visualizer.display_current_results(iters, acc, name='test_acc')
-            
