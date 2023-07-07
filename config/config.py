@@ -7,6 +7,8 @@ class Config(object):
     easy_margin = False
     use_se = False
     loss = 'focal_loss'
+    load_model = False
+    load_optimizer = False
 
     display = False
     finetune = False
