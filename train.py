@@ -27,7 +27,7 @@ def get_all_embeddings(dataset, model):
     return tester.get_all_embeddings(dataset, model)
 
 ### compute accuracy using AccuracyCalculator from pytorch-metric-learning ###
-def test(train_set, test_set, model, accuracy_calculator):
+def test(train_set, test_set, model, accuracy_calculator, epoch):
     train_embeddings, train_labels = get_all_embeddings(train_set, model)
     test_embeddings, test_labels = get_all_embeddings(test_set, model)
     train_labels = train_labels.squeeze(1)
@@ -36,12 +36,14 @@ def test(train_set, test_set, model, accuracy_calculator):
     accuracies = accuracy_calculator.get_accuracy(
         test_embeddings, test_labels, train_embeddings, train_labels, False
     )
-    print("Test set accuracy (Precision@1) = {}".format(accuracies["precision_at_1"]))
+    print("Test set accuracy at {} (Precision@1) = {}".format(epoch,accuracies["precision_at_1"]))
     return accuracies
 
 
 if __name__ == '__main__':
     best_loss = 1000
+    best_acc = 0.1
+
     runtime = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 
     s = 64
@@ -93,7 +95,7 @@ if __name__ == '__main__':
     elif opt.backbone == 'resnet50':
         model = resnet50()
     elif opt.backbone == 'mobilefacenet':
-        model = MobileFaceNet(512).to(torch.device("cuda:0") if torch.cuda.is_available() else "cpu")
+        model = MobileFaceNet(512).to(device)
 
     if opt.load_model:
       model_dict = model.state_dict()
@@ -172,20 +174,31 @@ if __name__ == '__main__':
 
                 start = time.time()
 
-        if loss < best_loss:
-            best_loss =loss
-            path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_original_" + str(i) + "pytorch_metric_learning.pt"
-            torch.save({
-                    'epoch': i,
-                    'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict(),
-                    'loss': best_loss,
-                }, path)
+        # if loss < best_loss:
+        #     best_loss = loss
+        #     path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss) + "_" + str(i) + "pytorch_metric_learning.pt"
+        #     torch.save({
+        #             'epoch': i,
+        #             'model_state_dict': model.state_dict(),
+        #             'optimizer_state_dict': optimizer.state_dict(),
+        #             'loss': best_loss,
+        #         }, path)
             # save_model(model, opt.checkpoints_path, opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_orriginal_", i)
             # save_optimizer(model, opt.checkpoints_optimizer_save_path, opt.optimizer + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_orriginal_" , i)
 
         model.eval()
         acc = test(train_dataset, test_dataset, model, accuracy_calculator)
+        if (acc["precision_at_1"] > best_acc):
+            best_acc = acc["precision_at_1"]
+            path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss) + "_" + str(i) + "_acc=" + str(acc["precision_at_1"]) + "pytorch_metric_learning.pt"
+            torch.save({
+                    'epoch': i,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'loss': best_loss,
+                    'acc': best_acc,
+                }, path)
+
         #acc = lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
         log_file1.write("%s\t%.3f\n" \
                        % (i, acc["precision_at_1"]))
