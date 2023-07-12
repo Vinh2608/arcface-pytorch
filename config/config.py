@@ -1,35 +1,37 @@
 class Config(object):
     env = 'default'
-    backbone = 'resnet18'
+    backbone = 'mobilefacenet'
     classify = 'softmax'
-    num_classes = 10575
+    num_classes = 580
     metric = 'arc_margin'
     easy_margin = False
     use_se = False
     loss = 'focal_loss'
-    load_model = False
-    load_optimizer = False
 
     display = False
     finetune = False
+    load_optimizer = False
+    load_model = False
 
-    train_root = '/content/CASIA-maxpy-clean/'
-    train_list = '/content/train_data_13938.txt'
+    train_root = '/content/arcface-pytorch/data/Datasets/VN-celeb_align_frontal/train'
+    train_list = '/content/arcface-pytorch/data/Datasets/label_train.txt'
     #val_list = '/data/Datasets/webface/val_data_13938.txt'
 
     #test_root = '/data1/Datasets/anti-spoofing/test/data_align_256'
     #test_list = 'test.txt'
 
-    lfw_root = '/content/lfw-align-128'
-    lfw_test_list = 'lfw_test_pair.txt'
+    lfw_root = '/content/arcface-pytorch/data/Datasets/VN-celeb_align_frontal/test'
+    lfw_test_list = '/content/arcface-pytorch/data/Datasets/pairs_new_test_VNCeleb_align_frontal.txt'
 
     checkpoints_path = 'checkpoints'
-    load_model_path = 'models/resnet18.pth'
-    test_model_path = '/content/resnet18_110.pth'
+    checkpoints_optimizer_path = 'checkpoints_optimizer_path/sgd_s=72_m=0.2_60.pth'
+    checkpoints_optimizer_save_path = 'checkpoints_optimizer_path'
+    load_model_path = 'checkpoints/mobilefacenet_s=72_m=0.2_60.pth'
+    test_model_path = 'checkpoints/mobilefacenet_s=72_m=0.2_60.pth'
     save_interval = 10
 
-    train_batch_size = 16  # batch size
-    test_batch_size = 60
+    train_batch_size = 200  # batch size
+    test_batch_size = 100
 
     input_shape = (1, 128, 128)
 
@@ -43,7 +45,7 @@ class Config(object):
     debug_file = '/tmp/debug'  # if os.path.exists(debug_file): enter ipdb
     result_file = 'result.csv'
 
-    max_epoch = 50
+    max_epoch = 100
     lr = 1e-1  # initial learning rate
     lr_step = 10
     lr_decay = 0.95  # when val_loss increase, lr = lr*lr_decay
