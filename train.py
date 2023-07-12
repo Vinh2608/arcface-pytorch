@@ -52,7 +52,6 @@ if __name__ == '__main__':
     s = 64
     m = 0.2
    
-
     log_file1 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_testing.txt"), "w", encoding="utf-8")
     log_file1.write("epoch\ttest_acc\n")
     log_file2 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_training.txt"), "w", encoding="utf-8")
@@ -187,7 +186,7 @@ if __name__ == '__main__':
             # save_optimizer(model, opt.checkpoints_optimizer_save_path, opt.optimizer + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_orriginal_" , i)
 
         model.eval()
-        acc = test(train_dataset, test_dataset, model, accuracy_calculator)
+        acc = test(train_dataset, test_dataset, model, accuracy_calculator, i)
         if (acc["precision_at_1"] > best_acc):
             best_acc = acc["precision_at_1"]
             path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.data.cpu().numpy() ) + "_" + str(i) + "pytorch_metric_learning.pt"
