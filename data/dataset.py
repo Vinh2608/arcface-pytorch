@@ -21,10 +21,10 @@ class Dataset(data.Dataset):
         imgs = [os.path.join(root, img[:-1]) for img in imgs]
         self.imgs = np.random.permutation(imgs)
 
-        # normalize = T.Normalize(mean=[0.5, 0.5, 0.5],
-        #                         std=[0.5, 0.5, 0.5])
+        normalize = T.Normalize(mean=[0.60746885, 0.47471561, 0.41313071]
+                                std = [0.2621818,0.23118107,0.2242216])
 
-        normalize = T.Normalize(mean=[0.5], std=[0.5])
+        #normalize = T.Normalize(mean=[0.5], std=[0.5])
 
         if self.phase == 'train':
             self.transforms = T.Compose([
@@ -45,7 +45,7 @@ class Dataset(data.Dataset):
         splits = sample.split()
         img_path = splits[0]
         data = Image.open(img_path)
-        data = data.convert('L')
+        #data = data.convert('L')
         data = self.transforms(data)
         label = np.int32(splits[1])
         return data.float(), label

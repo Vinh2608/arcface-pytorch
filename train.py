@@ -18,19 +18,32 @@ from torch.optim.lr_scheduler import StepLR
 from test import *
 from datetime import datetime
 
+from pytorch_metric_learning import losses, testers
+from pytorch_metric_learning.utils.accuracy_calculator import AccuracyCalculator
 
-def save_model(model, save_path, name, iter_cnt):
-    save_name = os.path.join(save_path, name + '_' + str(iter_cnt) + '.pth')
-    torch.save(model.state_dict(), save_name)
-    return save_name
 
-def save_optimizer(optimizer, save_path, name, iter_cnt):
-    save_name = os.path.join(save_path, name + '_' + str(iter_cnt) + '.pth')
-    torch.save(optimizer.state_dict(), save_name)
-    return save_name
+def get_all_embeddings(dataset, model):
+    tester = testers.BaseTester()
+    return tester.get_all_embeddings(dataset, model)
+
+### compute accuracy using AccuracyCalculator from pytorch-metric-learning ###
+def test(train_set, test_set, model, accuracy_calculator):
+    train_embeddings, train_labels = get_all_embeddings(train_set, model)
+    test_embeddings, test_labels = get_all_embeddings(test_set, model)
+    train_labels = train_labels.squeeze(1)
+    test_labels = test_labels.squeeze(1)
+    print("Computing accuracy")
+    accuracies = accuracy_calculator.get_accuracy(
+        test_embeddings, test_labels, train_embeddings, train_labels, False
+    )
+    print("Test set accuracy (Precision@1) = {}".format(accuracies["precision_at_1"]))
+    return accuracies
+
 
 if __name__ == '__main__':
+    best_loss = 1000
     runtime = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+
     s = 64
     m = 0.2
     opt = Config()
@@ -43,15 +56,16 @@ if __name__ == '__main__':
         visualizer = Visualizer()
     device = torch.device("cuda")
 
-    train_transforms = T.Compose([
-        T.RandomCrop(opt.input_shape[1:]),
-        T.RandomHorizontalFlip(),
-        T.ToTensor(),
-        T.Normalize(mean=[0.5,0.5,0.5], std=[0.5,0.5,0.5]),
-    ])
+    # train_transforms = T.Compose([
+    #     T.RandomCrop(opt.input_shape[1:]),
+    #     T.RandomHorizontalFlip(),
+    #     T.ToTensor(),
+    #     T.Normalize(mean=[0.5,0.5,0.5], std=[0.5,0.5,0.5]),
+    # ])
 
-    train_dataset = torchvision.datasets.ImageFolder(opt.train_root, transform=train_transforms)
-    # train_dataset = Dataset(opt.train_root, opt.train_list, phase='train', input_shape=opt.input_shape)
+    # train_dataset = torchvision.datasets.ImageFolder(opt.train_root, transform=train_transforms)
+    train_dataset = Dataset(opt.train_root, opt.train_list, phase='train', input_shape=opt.input_shape)
+    test_dataset = Dataset(opt.test_root, opt.test_list, phase = 'test', input_shape=opt.input_shape)
     trainloader = data.DataLoader(train_dataset,
                                   batch_size=opt.train_batch_size,
                                   shuffle=True,
@@ -88,19 +102,6 @@ if __name__ == '__main__':
       model_dict.update(pretrained_dict)
       model.load_state_dict(model_dict)
       print(model)
-
-    model.conv1.requires_grad = False
-    model.conv2_dw.requires_grad_ = False
-    model.conv_23.requires_grad = False
-    model.conv_3.requires_grad = False
-    model.conv_34.requires_grad = False
-    model.conv_4.requires_grad = False
-    model.conv_45.requires_grad = False
-    model.conv_5.requires_grad = False
-    model.conv_6_dw.requires_grad = True
-    model.linear.requires_grad = True
-    model.bn.requires_grad = True
-
     
     if opt.metric == 'add_margin':
         metric_fc = AddMarginProduct(512, opt.num_classes, s=s, m=m)
@@ -170,12 +171,20 @@ if __name__ == '__main__':
 
                 start = time.time()
 
-        if i % opt.save_interval == 0 or i == opt.max_epoch:
-            save_model(model, opt.checkpoints_path, opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_", i)
-            save_optimizer(model, opt.checkpoints_optimizer_save_path, opt.optimizer + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_" , i)
+        if loss < best_loss:
+            path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_original_" + str(i) + "pytorch_metric_learning.pt"
+            torch.save({
+                    'epoch': i,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'loss': best_loss,
+                }, path)
+            # save_model(model, opt.checkpoints_path, opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_orriginal_", i)
+            # save_optimizer(model, opt.checkpoints_optimizer_save_path, opt.optimizer + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_orriginal_" , i)
 
         model.eval()
-        acc = lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
+        acc = test(train_dataset, test_dataset, model, accuracy_calculator)
+        #acc = lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
         log_file1.write("%s\t%.3f\n" \
                        % (i, acc))
         if opt.display:
