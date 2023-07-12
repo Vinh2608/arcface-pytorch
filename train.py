@@ -41,16 +41,17 @@ def test(train_set, test_set, model, accuracy_calculator, epoch):
 
 
 if __name__ == '__main__':
+    opt = Config()
     checkpoint = torch.load(opt.load_model_path)
     best_loss = checkpoint['loss']
     best_acc = checkpoint['acc']
-    opt = Config()
-
+    epoch = checkpoint['epoch']
 
     runtime = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 
     s = 64
     m = 0.2
+   
 
     log_file1 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_testing.txt"), "w", encoding="utf-8")
     log_file1.write("epoch\ttest_acc\n")
@@ -98,9 +99,13 @@ if __name__ == '__main__':
         model = resnet50()
     elif opt.backbone == 'mobilefacenet':
         model = MobileFaceNet(512).to(device)
-
+  
     if opt.load_model:
-      model.load_state_dict(checkpoint['model_state_dict'])
+      model_dict = model.state_dict()
+      pretrained_dict = checkpoint['model_state_dict']
+      pretrained_dict = {k:v for k,v in pretrained_dict.items() if k in model_dict}
+      model_dict.update(pretrained_dict)
+      model.load_state_dict(model_dict)
     
     if opt.metric == 'add_margin':
         metric_fc = AddMarginProduct(512, opt.num_classes, s=s, m=m)
@@ -113,7 +118,6 @@ if __name__ == '__main__':
 
     # view_model(model, opt.input_shape)
     print(model)
-    model.to(device)
     model = DataParallel(model)
     metric_fc.to(device)
     metric_fc = DataParallel(metric_fc)
@@ -124,14 +128,18 @@ if __name__ == '__main__':
     else:
         optimizer = torch.optim.Adam([{'params': model.parameters()}, {'params': metric_fc.parameters()}],
                                      lr=opt.lr, weight_decay=opt.weight_decay)
-    if opt.load_optimizer:  
-      optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    if opt.load_optimizer:
+      optimizer_dict = optimizer.state_dict()
+      pretrained_dict = checkpoint['optimizer_state_dict']  
+      pretrained_dict = {k:v for k,v in pretrained_dict.items() if k in optimizer_dict}
+      optimizer_dict.update(pretrained_dict)
+      optimizer.load_state_dict(optimizer_dict)
 
     scheduler = StepLR(optimizer, step_size=opt.lr_step, gamma=0.1)
 
     accuracy_calculator = AccuracyCalculator(include=("precision_at_1",), k=1)
     start = time.time()
-    for i in range(opt.max_epoch + 1):
+    for i in range(epoch,opt.max_epoch + 1):
         scheduler.step()
 
         model.train()
@@ -166,10 +174,9 @@ if __name__ == '__main__':
                     visualizer.display_current_results(iters, acc, name='train_acc')
 
                 start = time.time()
-
-        if loss < best_loss:
+        if loss.data.cpu().numpy() < best_loss:
             best_loss = loss
-            path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.cpu().numpy()) + "_" + str(i) + "pytorch_metric_learning.pt"
+            path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.data.cpu().numpy() ) + "_" + str(i) + "pytorch_metric_learning.pt"
             torch.save({
                     'epoch': i,
                     'model_state_dict': model.state_dict(),
@@ -183,7 +190,7 @@ if __name__ == '__main__':
         acc = test(train_dataset, test_dataset, model, accuracy_calculator)
         if (acc["precision_at_1"] > best_acc):
             best_acc = acc["precision_at_1"]
-            path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.cpu().numpy()) + "_" + str(i) + "pytorch_metric_learning.pt"
+            path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.data.cpu().numpy() ) + "_" + str(i) + "pytorch_metric_learning.pt"
             torch.save({
                     'epoch': i,
                     'model_state_dict': model.state_dict(),
@@ -197,4 +204,4 @@ if __name__ == '__main__':
                        % (i, acc["precision_at_1"]))
         if opt.display:
             visualizer.display_current_results(iters, acc, name='test_acc')
-        
+            
