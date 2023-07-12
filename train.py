@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
     if opt.display:
         visualizer = Visualizer()
-    device = torch.device("cuda")
+    device = torch.device("cuda:0")
 
     # train_transforms = T.Compose([
     #     T.RandomCrop(opt.input_shape[1:]),
@@ -134,6 +134,7 @@ if __name__ == '__main__':
 
     scheduler = StepLR(optimizer, step_size=opt.lr_step, gamma=0.1)
 
+    accuracy_calculator = AccuracyCalculator(include=("precision_at_1",), k=1)
     start = time.time()
     for i in range(opt.max_epoch + 1):
         scheduler.step()
@@ -172,6 +173,7 @@ if __name__ == '__main__':
                 start = time.time()
 
         if loss < best_loss:
+            best_loss =loss
             path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_original_" + str(i) + "pytorch_metric_learning.pt"
             torch.save({
                     'epoch': i,
@@ -186,7 +188,7 @@ if __name__ == '__main__':
         acc = test(train_dataset, test_dataset, model, accuracy_calculator)
         #acc = lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
         log_file1.write("%s\t%.3f\n" \
-                       % (i, acc))
+                       % (i, acc["precision_at_1"]))
         if opt.display:
             visualizer.display_current_results(iters, acc, name='test_acc')
             

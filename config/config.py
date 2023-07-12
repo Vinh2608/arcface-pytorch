@@ -2,7 +2,7 @@ class Config(object):
     env = 'default'
     backbone = 'mobilefacenet'
     classify = 'softmax'
-    num_classes = 1020
+    num_classes = 1021
     metric = 'arc_margin'
     easy_margin = False
     use_se = False
@@ -11,7 +11,7 @@ class Config(object):
     display = False
     finetune = False
     load_optimizer = False
-    load_model = False
+    load_model = True
 
     train_root = '/content/arcface-pytorch/data/Datasets/VN-celeb_align_frontal_full'
     train_list = '/content/arcface-pytorch/label_train.txt'
@@ -26,7 +26,7 @@ class Config(object):
     checkpoints_path = 'checkpoints'
     checkpoints_optimizer_path = 'checkpoints_optimizer_path/sgd_s=72_m=0.2_60.pth'
     checkpoints_optimizer_save_path = 'checkpoints_optimizer_path'
-    load_model_path = 'checkpoints/mobilefacenet_s=64_m=0.2batch_size=200_align_frontal__70_acc905'
+    load_model_path = 'checkpoints/mobilefacenet_s=64_m=0.2batch_size=200_align_frontal__70_acc905.pth'
     test_model_path = 'checkpoints/mobilefacenet_s=72_m=0.2_60.pth'
     save_interval = 10
 
