@@ -26,7 +26,7 @@ class Config(object):
     checkpoints_path = 'checkpoints/'
     checkpoints_optimizer_path = 'checkpoints_optimizer_path/sgd_s=72_m=0.2_60.pth'
     checkpoints_optimizer_save_path = 'checkpoints_optimizer_path'
-    load_model_path = 'checkpoints/mobilefacenet_s=64_m=0.2batch_size=200_align_frontal__70_acc905.pth'
+    load_model_path = 'checkpoints/mobilefacenet_s=64_m=0.2batch_size=200loss=2.4415245_9_acc=0.3905627291567033pytorch_metric_learning.pt'
     test_model_path = 'checkpoints/mobilefacenet_s=72_m=0.2_60.pth'
     save_interval = 10
 

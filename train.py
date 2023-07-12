@@ -44,12 +44,13 @@ if __name__ == '__main__':
     checkpoint = torch.load(opt.load_model_path)
     best_loss = checkpoint['loss']
     best_acc = checkpoint['acc']
+    opt = Config()
+
 
     runtime = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 
     s = 64
     m = 0.2
-    opt = Config()
 
     log_file1 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_testing.txt"), "w", encoding="utf-8")
     log_file1.write("epoch\ttest_acc\n")
