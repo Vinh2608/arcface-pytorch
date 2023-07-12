@@ -41,8 +41,9 @@ def test(train_set, test_set, model, accuracy_calculator, epoch):
 
 
 if __name__ == '__main__':
-    best_loss = 1000
-    best_acc = 0.1
+    checkpoint = torch.load(opt.load_model_path)
+    best_loss = checkpoint['loss']
+    best_acc = checkpoint['acc']
 
     runtime = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 
@@ -98,12 +99,7 @@ if __name__ == '__main__':
         model = MobileFaceNet(512).to(device)
 
     if opt.load_model:
-      model_dict = model.state_dict()
-      pretrained_dict = torch.load(opt.load_model_path)
-      pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
-      model_dict.update(pretrained_dict)
-      model.load_state_dict(model_dict)
-      print(model)
+      model.load_state_dict(checkpoint['model_state_dict'])
     
     if opt.metric == 'add_margin':
         metric_fc = AddMarginProduct(512, opt.num_classes, s=s, m=m)
@@ -128,11 +124,7 @@ if __name__ == '__main__':
         optimizer = torch.optim.Adam([{'params': model.parameters()}, {'params': metric_fc.parameters()}],
                                      lr=opt.lr, weight_decay=opt.weight_decay)
     if opt.load_optimizer:  
-      optimizer_dict = optimizer.state_dict()
-      pretrained_optimizer_dict = torch.load(opt.checkpoints_optimizer_path)
-      pretrained_optimizer_dict = {k: v for k, v in pretrained_optimizer_dict.items() if k in optimizer_dict}
-      optimizer_dict.update(pretrained_optimizer_dict)
-      optimizer.load_state_dict(optimizer_dict)
+      optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
     scheduler = StepLR(optimizer, step_size=opt.lr_step, gamma=0.1)
 
@@ -174,15 +166,15 @@ if __name__ == '__main__':
 
                 start = time.time()
 
-        # if loss < best_loss:
-        #     best_loss = loss
-        #     path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss) + "_" + str(i) + "pytorch_metric_learning.pt"
-        #     torch.save({
-        #             'epoch': i,
-        #             'model_state_dict': model.state_dict(),
-        #             'optimizer_state_dict': optimizer.state_dict(),
-        #             'loss': best_loss,
-        #         }, path)
+        if loss < best_loss:
+            best_loss = loss
+            path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.cpu().numpy()) + "_" + str(i) + "pytorch_metric_learning.pt"
+            torch.save({
+                    'epoch': i,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'loss': best_loss,
+                }, path)
             # save_model(model, opt.checkpoints_path, opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_orriginal_", i)
             # save_optimizer(model, opt.checkpoints_optimizer_save_path, opt.optimizer + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_orriginal_" , i)
 
@@ -190,7 +182,7 @@ if __name__ == '__main__':
         acc = test(train_dataset, test_dataset, model, accuracy_calculator)
         if (acc["precision_at_1"] > best_acc):
             best_acc = acc["precision_at_1"]
-            path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss) + "_" + str(i) + "_acc=" + str(acc["precision_at_1"]) + "pytorch_metric_learning.pt"
+            path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.cpu().numpy()) + "_" + str(i) + "pytorch_metric_learning.pt"
             torch.save({
                     'epoch': i,
                     'model_state_dict': model.state_dict(),
@@ -204,4 +196,4 @@ if __name__ == '__main__':
                        % (i, acc["precision_at_1"]))
         if opt.display:
             visualizer.display_current_results(iters, acc, name='test_acc')
-            
+        
