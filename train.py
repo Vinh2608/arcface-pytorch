@@ -173,9 +173,9 @@ if __name__ == '__main__':
                     visualizer.display_current_results(iters, acc, name='train_acc')
 
                 start = time.time()
-        if loss.data.cpu().numpy() < best_loss:
-            best_loss = loss
-            path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.data.cpu().numpy() ) + "_" + str(i) + "pytorch_metric_learning.pt"
+        if loss.item() < best_loss:
+            best_loss = loss.item()
+            path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_" + str(i) + "pytorch_metric_learning.pt"
             torch.save({
                     'epoch': i,
                     'model_state_dict': model.state_dict(),
@@ -189,7 +189,7 @@ if __name__ == '__main__':
         acc = test(train_dataset, test_dataset, model, accuracy_calculator, i)
         if (acc["precision_at_1"] > best_acc):
             best_acc = acc["precision_at_1"]
-            path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.data.cpu().numpy() ) + "_" + str(i) + "pytorch_metric_learning.pt"
+            path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_" + str(i) + "pytorch_metric_learning.pt"
             torch.save({
                     'epoch': i,
                     'model_state_dict': model.state_dict(),
