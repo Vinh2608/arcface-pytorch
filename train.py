@@ -17,7 +17,7 @@ from torch.nn import DataParallel
 from torch.optim.lr_scheduler import StepLR
 from test import *
 from datetime import datetime
-
+from models import get_model
 from pytorch_metric_learning import losses, testers
 from pytorch_metric_learning.utils.accuracy_calculator import AccuracyCalculator
 
@@ -42,8 +42,8 @@ def test(train_set, test_set, model, accuracy_calculator, epoch):
 if __name__ == '__main__':
     opt = Config()
     #checkpoint = torch.load(opt.load_model_path)
-    best_loss = 10#checkpoint['loss']
-    best_acc = 0.4#checkpoint['acc']
+    best_loss = 10 #checkpoint['loss']
+    best_acc = 0.4 #checkpoint['acc']
     epoch = 0 #checkpoint['epoch']
 
     runtime = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
@@ -97,6 +97,9 @@ if __name__ == '__main__':
         model = resnet50()
     elif opt.backbone == 'mobilefacenet':
         model = MobileFaceNet(512).to(device)
+    elif opt.backbone == 'iresnet18':
+        model = get_model("r18",fp16=False)
+        model.load_state_dict(torch.load('/content/arcface-pytorch/backbone.pth', device))
   
     if opt.load_model:
         if opt.backbone != 'resnet18':
@@ -128,10 +131,10 @@ if __name__ == '__main__':
     metric_fc = DataParallel(metric_fc)
 
     if opt.optimizer == 'sgd':
-        optimizer = torch.optim.SGD([{'params': model.parameters()}, {'params': metric_fc.parameters()}],
+        optimizer = torch.optim.SGD([{'params': metric_fc.parameters()}],
                                     lr=opt.lr, weight_decay=opt.weight_decay)
     else:
-        optimizer = torch.optim.Adam([{'params': model.parameters()}, {'params': metric_fc.parameters()}],
+        optimizer = torch.optim.Adam([{'params': metric_fc.parameters()}],
                                      lr=opt.lr, weight_decay=opt.weight_decay)
     if opt.load_optimizer:
       optimizer_dict = optimizer.state_dict()
