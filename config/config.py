@@ -33,7 +33,7 @@ class Config(object):
     train_batch_size = 200  # batch size
     test_batch_size = 100
 
-    input_shape = (3, 128, 128)
+    input_shape = (3, 112, 112)
 
     optimizer = 'sgd'
 

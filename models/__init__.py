@@ -4,7 +4,7 @@ from models.focal_loss import *
 from models.mobilefacenet import *
 
 from .iresnet import iresnet18, iresnet34, iresnet50, iresnet100, iresnet200
-from .mobilefacenet import get_mbf
+#from .mobilefacenet import get_mbf
 
 
 def get_model(name, **kwargs):
