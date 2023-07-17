@@ -99,7 +99,7 @@ if __name__ == '__main__':
         model = MobileFaceNet(512).to(device)
     elif opt.backbone == 'iresnet18':
         model = get_model("r18",fp16=False)
-        model.load_state_dict(torch.load('/content/arcface-pytorch/backbone.pth', device))
+        
   
     if opt.load_model:
         if opt.backbone != 'resnet18':
@@ -108,6 +108,8 @@ if __name__ == '__main__':
             pretrained_dict = {k:v for k,v in pretrained_dict.items() if k in model_dict}
             model_dict.update(pretrained_dict)
             model.load_state_dict(model_dict)
+        elif opt.backbone == 'iresnet18':
+            model.load_state_dict(torch.load('/content/arcface-pytorch/backbone.pth', device))
         else:
             model_dict = model.state_dict()
             pretrained_dict = checkpoint['model_state_dict']
@@ -115,6 +117,7 @@ if __name__ == '__main__':
             model_dict.update(pretrained_dict)
             model.load_state_dict(model_dict)
     
+
     if opt.metric == 'add_margin':
         metric_fc = AddMarginProduct(512, opt.num_classes, s=s, m=m)
     elif opt.metric == 'arc_margin':
@@ -126,15 +129,16 @@ if __name__ == '__main__':
 
     # view_model(model, opt.input_shape)
     print(model)
+    model.to(device)
     model = DataParallel(model)
     metric_fc.to(device)
     metric_fc = DataParallel(metric_fc)
 
     if opt.optimizer == 'sgd':
-        optimizer = torch.optim.SGD([{'params': metric_fc.parameters()}],
+        optimizer = torch.optim.SGD([{'params': model.parameters()},{'params': metric_fc.parameters()}],
                                     lr=opt.lr, weight_decay=opt.weight_decay)
     else:
-        optimizer = torch.optim.Adam([{'params': metric_fc.parameters()}],
+        optimizer = torch.optim.Adam([{'params': model.parameters()},{'params': metric_fc.parameters()}],
                                      lr=opt.lr, weight_decay=opt.weight_decay)
     if opt.load_optimizer:
       optimizer_dict = optimizer.state_dict()
