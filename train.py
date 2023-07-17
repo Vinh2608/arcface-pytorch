@@ -39,13 +39,12 @@ def test(train_set, test_set, model, accuracy_calculator, epoch):
     print("Test set accuracy at {} (Precision@1) = {}".format(epoch,accuracies["precision_at_1"]))
     return accuracies
 
-
 if __name__ == '__main__':
     opt = Config()
-    checkpoint = torch.load(opt.load_model_path)
-    best_loss = checkpoint['loss']
-    best_acc = checkpoint['acc']
-    epoch = checkpoint['epoch']
+    #checkpoint = torch.load(opt.load_model_path)
+    best_loss = 10#checkpoint['loss']
+    best_acc = 0.4#checkpoint['acc']
+    epoch = 0 #checkpoint['epoch']
 
     runtime = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 
@@ -100,11 +99,18 @@ if __name__ == '__main__':
         model = MobileFaceNet(512).to(device)
   
     if opt.load_model:
-      model_dict = model.state_dict()
-      pretrained_dict = checkpoint['model_state_dict']
-      pretrained_dict = {k:v for k,v in pretrained_dict.items() if k in model_dict}
-      model_dict.update(pretrained_dict)
-      model.load_state_dict(model_dict)
+        if opt.backbone != 'resnet18':
+            model_dict = model.state_dict()
+            pretrained_dict = checkpoint['model_state_dict']
+            pretrained_dict = {k:v for k,v in pretrained_dict.items() if k in model_dict}
+            model_dict.update(pretrained_dict)
+            model.load_state_dict(model_dict)
+        else:
+            model_dict = model.state_dict()
+            pretrained_dict = checkpoint['model_state_dict']
+            pretrained_dict = {k:v for k,v in pretrained_dict.items() if k in model_dict}
+            model_dict.update(pretrained_dict)
+            model.load_state_dict(model_dict)
     
     if opt.metric == 'add_margin':
         metric_fc = AddMarginProduct(512, opt.num_classes, s=s, m=m)

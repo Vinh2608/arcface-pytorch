@@ -1,3 +1,4 @@
 !.gitignore
 *.pyc
 *.pth
+checkpoints/resnet18_s=64_m=0.5batch_size=200loss=10.97199821472168_acc=0.4057249533291848_54pytorch_metric_learning.pt
