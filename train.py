@@ -42,9 +42,9 @@ def test(train_set, test_set, model, accuracy_calculator, epoch):
 if __name__ == '__main__':
     opt = Config()
     #checkpoint = torch.load(opt.load_model_path)
-    best_loss = 10 #checkpoint['loss']
-    best_acc = 0.4 #checkpoint['acc']
-    epoch = 0 #checkpoint['epoch']
+    best_loss =  20#checkpoint['loss']
+    best_acc = 0.1#checkpoint['acc']
+    epoch = 0#checkpoint['epoch']
 
     runtime = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 
@@ -102,14 +102,14 @@ if __name__ == '__main__':
         
   
     if opt.load_model:
-        if opt.backbone != 'resnet18':
+        if opt.backbone == 'resnet18':
             model_dict = model.state_dict()
             pretrained_dict = checkpoint['model_state_dict']
             pretrained_dict = {k:v for k,v in pretrained_dict.items() if k in model_dict}
             model_dict.update(pretrained_dict)
             model.load_state_dict(model_dict)
         elif opt.backbone == 'iresnet18':
-            model.load_state_dict(torch.load('/content/arcface-pytorch/backbone.pth', device))
+            model.load_state_dict(torch.load(opt.load_model_path))
         else:
             model_dict = model.state_dict()
             pretrained_dict = checkpoint['model_state_dict']
@@ -127,8 +127,6 @@ if __name__ == '__main__':
     else:
         metric_fc = nn.Linear(512, opt.num_classes)
 
-    for parameters in model.parameters():
-        parameters.requires_grad = False
 
     # view_model(model, opt.input_shape)
     print(model)
@@ -138,11 +136,12 @@ if __name__ == '__main__':
     metric_fc = DataParallel(metric_fc)
 
     if opt.optimizer == 'sgd':
-        optimizer = torch.optim.SGD([{'params': metric_fc.parameters()}],
+        optimizer = torch.optim.SGD([{'params': model.parameters()},{'params': metric_fc.parameters()}],
                                     lr=opt.lr, weight_decay=opt.weight_decay)
     else:
-        optimizer = torch.optim.Adam([{'params': metric_fc.parameters()}],
+        optimizer = torch.optim.Adam([{'params': model.parameters()},{'params': metric_fc.parameters()}],
                                      lr=opt.lr, weight_decay=opt.weight_decay)
+    
     if opt.load_optimizer:
       optimizer_dict = optimizer.state_dict()
       pretrained_dict = checkpoint['optimizer_state_dict']  
@@ -194,27 +193,31 @@ if __name__ == '__main__':
 
         if loss.item() < best_loss:
             best_loss = loss.item()
-            path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_acc=" + str(acc['precision_at_1']) + "_" + str(i) + "pytorch_metric_learning.pt"
+            path1 = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_acc=" + str(acc['precision_at_1']) + "_" + str(i) + "pytorch_metric_learning.pt"
             torch.save({
                     'epoch': i,
                     'model_state_dict': model.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict(),
                     'loss': best_loss,
-                }, path)
+                }, path1)
+            path2 = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_acc=" + str(best_acc) + "_" + str(i) + "fc.pt"
+            torch.save(metric_fc, path2)
             # save_model(model, opt.checkpoints_path, opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_orriginal_", i)
             # save_optimizer(model, opt.checkpoints_optimizer_save_path, opt.optimizer + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_orriginal_" , i)
 
         
         if (acc["precision_at_1"] > best_acc):
             best_acc = acc["precision_at_1"]
-            path = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_acc=" + str(best_acc) + "_" + str(i) + "pytorch_metric_learning.pt"
+            path1 = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_acc=" + str(best_acc) + "_" + str(i) + "pytorch_metric_learning.pt"
             torch.save({
                     'epoch': i,
                     'model_state_dict': model.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict(),
                     'loss': best_loss,
                     'acc': best_acc,
-                }, path)
+                }, path1)
+            path2 = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_acc=" + str(best_acc) + "_" + str(i) + "fc.pt"
+            torch.save(metric_fc, path2)
 
         #acc = lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
         log_file1.write("%s\t%.3f\n" \

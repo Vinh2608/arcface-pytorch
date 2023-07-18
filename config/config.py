@@ -1,6 +1,6 @@
 class Config(object):
     env = 'default'
-    backbone = 'mobilefacenet'
+    backbone = 'iresnet18'
     classify = 'softmax'
     num_classes = 1021
     metric = 'arc_margin'
@@ -26,12 +26,12 @@ class Config(object):
     checkpoints_path = 'checkpoints/'
     checkpoints_optimizer_path = 'checkpoints_optimizer_path/sgd_s=72_m=0.2_60.pth'
     checkpoints_optimizer_save_path = 'checkpoints_optimizer_path'
-    load_model_path = 'checkpoints/mobilefacenet_s=64_m=0.2batch_size=200loss=2.4415245_9_acc=0.3905627291567033pytorch_metric_learning.pt'
+    load_model_path = '/content/arcface-pytorch/backbone.pth'
     test_model_path = 'checkpoints/mobilefacenet_s=72_m=0.2_60.pth'
     save_interval = 10
 
-    train_batch_size = 200  # batch size
-    test_batch_size = 100
+    train_batch_size = 16  # batch size
+    test_batch_size = 50
 
     input_shape = (3, 112, 112)
 
