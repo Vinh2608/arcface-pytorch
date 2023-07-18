@@ -127,6 +127,9 @@ if __name__ == '__main__':
     else:
         metric_fc = nn.Linear(512, opt.num_classes)
 
+    for parameters in model.parameters():
+        parameters.requires_grad = False
+
     # view_model(model, opt.input_shape)
     print(model)
     model.to(device)
@@ -135,10 +138,10 @@ if __name__ == '__main__':
     metric_fc = DataParallel(metric_fc)
 
     if opt.optimizer == 'sgd':
-        optimizer = torch.optim.SGD([{'params': model.parameters()},{'params': metric_fc.parameters()}],
+        optimizer = torch.optim.SGD([{'params': metric_fc.parameters()}],
                                     lr=opt.lr, weight_decay=opt.weight_decay)
     else:
-        optimizer = torch.optim.Adam([{'params': model.parameters()},{'params': metric_fc.parameters()}],
+        optimizer = torch.optim.Adam([{'params': metric_fc.parameters()}],
                                      lr=opt.lr, weight_decay=opt.weight_decay)
     if opt.load_optimizer:
       optimizer_dict = optimizer.state_dict()
