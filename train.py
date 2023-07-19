@@ -188,36 +188,23 @@ if __name__ == '__main__':
                     visualizer.display_current_results(iters, acc, name='train_acc')
 
                 start = time.time()
+            if i % opt.save_interval == 0 or i == opt.max_epoch:
+                best_loss = loss.item()
+                path1 = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_acc=" + str(acc['precision_at_1']) + "_" + str(i) + "pytorch_metric_learning.pt"
+                torch.save({
+                        'epoch': i,
+                        'model_state_dict': model.state_dict(),
+                        'optimizer_state_dict': optimizer.state_dict(),
+                        'loss': best_loss,
+                    }, path1)
+                path2 = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_acc=" + str(best_acc) + "_" + str(i) + "fc.pt"
+                torch.save(metric_fc, path2)
         model.eval()
         acc = test(train_dataset, test_dataset, model, accuracy_calculator, i)
 
-        if loss.item() < best_loss:
-            best_loss = loss.item()
-            path1 = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_acc=" + str(acc['precision_at_1']) + "_" + str(i) + "pytorch_metric_learning.pt"
-            torch.save({
-                    'epoch': i,
-                    'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict(),
-                    'loss': best_loss,
-                }, path1)
-            path2 = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_acc=" + str(best_acc) + "_" + str(i) + "fc.pt"
-            torch.save(metric_fc, path2)
+       
             # save_model(model, opt.checkpoints_path, opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_orriginal_", i)
             # save_optimizer(model, opt.checkpoints_optimizer_save_path, opt.optimizer + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_orriginal_" , i)
-
-        
-        if (acc["precision_at_1"] > best_acc):
-            best_acc = acc["precision_at_1"]
-            path1 = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_acc=" + str(best_acc) + "_" + str(i) + "pytorch_metric_learning.pt"
-            torch.save({
-                    'epoch': i,
-                    'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict(),
-                    'loss': best_loss,
-                    'acc': best_acc,
-                }, path1)
-            path2 = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_acc=" + str(best_acc) + "_" + str(i) + "fc.pt"
-            torch.save(metric_fc, path2)
 
         #acc = lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
         log_file1.write("%s\t%.3f\n" \
