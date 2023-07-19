@@ -42,18 +42,18 @@ def test(train_set, test_set, model, accuracy_calculator, epoch):
 if __name__ == '__main__':
     opt = Config()
     #checkpoint = torch.load(opt.load_model_path)
-    best_loss =  20#checkpoint['loss']
-    best_acc = 0.1#checkpoint['acc']
-    epoch = 0#checkpoint['epoch']
+    best_loss =  20 #checkpoint['loss']
+    best_acc = 0.1 #checkpoint['acc']
+    epoch = 0 #checkpoint['epoch']
 
     runtime = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 
     s = 64
     m = 0.2
    
-    log_file1 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_testing.txt"), "w", encoding="utf-8")
+    log_file1 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_testing_r34.txt"), "w", encoding="utf-8")
     log_file1.write("epoch\ttest_acc\n")
-    log_file2 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_training.txt"), "w", encoding="utf-8")
+    log_file2 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_training_r34.txt"), "w", encoding="utf-8")
 
     if opt.display:
         visualizer = Visualizer()
@@ -99,8 +99,10 @@ if __name__ == '__main__':
         model = MobileFaceNet(512).to(device)
     elif opt.backbone == 'iresnet18':
         model = get_model("r18",fp16=False)
-        
-  
+    elif opt.backbone == 'iresnet34':
+        model = get_model("r34",fp16=False)
+
+
     if opt.load_model:
         if opt.backbone == 'resnet18':
             model_dict = model.state_dict()
@@ -109,6 +111,8 @@ if __name__ == '__main__':
             model_dict.update(pretrained_dict)
             model.load_state_dict(model_dict)
         elif opt.backbone == 'iresnet18':
+            model.load_state_dict(torch.load(opt.load_model_path))
+        elif opt.backbone == 'iresnet34':
             model.load_state_dict(torch.load(opt.load_model_path))
         else:
             model_dict = model.state_dict()
@@ -202,7 +206,6 @@ if __name__ == '__main__':
         model.eval()
         acc = test(train_dataset, test_dataset, model, accuracy_calculator, i)
 
-       
             # save_model(model, opt.checkpoints_path, opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_orriginal_", i)
             # save_optimizer(model, opt.checkpoints_optimizer_save_path, opt.optimizer + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_orriginal_" , i)
 

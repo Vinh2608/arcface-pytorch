@@ -1,6 +1,6 @@
 class Config(object):
     env = 'default'
-    backbone = 'iresnet18'
+    backbone = 'iresnet34'
     classify = 'softmax'
     num_classes = 1020
     metric = 'arc_margin'
@@ -26,7 +26,7 @@ class Config(object):
     checkpoints_path = 'checkpoints/'
     checkpoints_optimizer_path = 'checkpoints_optimizer_path/sgd_s=72_m=0.2_60.pth'
     checkpoints_optimizer_save_path = 'checkpoints_optimizer_path'
-    load_model_path = '/content/arcface-pytorch/backbone.pth'
+    load_model_path = '/content/arcface-pytorch/backboneR34.pth'
     test_model_path = 'checkpoints/mobilefacenet_s=72_m=0.2_60.pth'
     save_interval = 10
 
