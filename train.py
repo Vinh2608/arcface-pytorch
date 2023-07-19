@@ -51,8 +51,8 @@ if __name__ == '__main__':
     s = 64
     m = 0.2
    
-    log_file1 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_testing_r34.txt"), "w", encoding="utf-8")
-    log_file1.write("epoch\ttest_acc\n")
+    #log_file1 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_testing_r34.txt"), "w", encoding="utf-8")
+    #log_file1.write("epoch\ttest_acc\n")
     log_file2 = open(os.path.join('log', '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_align_frontal_training_r34.txt"), "w", encoding="utf-8")
 
     if opt.display:
@@ -155,7 +155,7 @@ if __name__ == '__main__':
 
     scheduler = StepLR(optimizer, step_size=opt.lr_step, gamma=0.1)
 
-    accuracy_calculator = AccuracyCalculator(include=("precision_at_1",), k=1)
+    #accuracy_calculator = AccuracyCalculator(include=("precision_at_1",), k=1)
     start = time.time()
     for i in range(epoch,opt.max_epoch + 1):
         scheduler.step()
@@ -194,23 +194,22 @@ if __name__ == '__main__':
                 start = time.time()
             if i % opt.save_interval == 0 or i == opt.max_epoch:
                 best_loss = loss.item()
-                path1 = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_acc=" + str(acc['precision_at_1']) + "_" + str(i) + "pytorch_metric_learning.pt"
+                path1 = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_" + str(i) + "pytorch_metric_learning.pt"
                 torch.save({
                         'epoch': i,
                         'model_state_dict': model.state_dict(),
                         'optimizer_state_dict': optimizer.state_dict(),
                         'loss': best_loss,
                     }, path1)
-                path2 = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_acc=" + str(best_acc) + "_" + str(i) + "fc.pt"
-        model.eval()
-        acc = test(train_dataset, test_dataset, model, accuracy_calculator, i)
+        #model.eval()
+        #acc = test(train_dataset, test_dataset, model, accuracy_calculator, i)
 
             # save_model(model, opt.checkpoints_path, opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_orriginal_", i)
             # save_optimizer(model, opt.checkpoints_optimizer_save_path, opt.optimizer + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "_orriginal_" , i)
 
         #acc = lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
-        log_file1.write("%s\t%.3f\n" \
-                       % (i, acc["precision_at_1"]))
+        # log_file1.write("%s\t%.3f\n" \
+        #                % (i, acc["precision_at_1"]))
         if opt.display:
             visualizer.display_current_results(iters, acc, name='test_acc')
             
