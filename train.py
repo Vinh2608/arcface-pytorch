@@ -193,13 +193,11 @@ if __name__ == '__main__':
 
                 start = time.time()
             if i % opt.save_interval == 0 or i == opt.max_epoch:
-                best_loss = loss.item()
-                path1 = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_" + str(i) + "pytorch_metric_learning.pt"
+                path1 = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size)  + "_" + str(i) + "pytorch_metric_learning.pt"
                 torch.save({
                         'epoch': i,
                         'model_state_dict': model.state_dict(),
                         'optimizer_state_dict': optimizer.state_dict(),
-                        'loss': best_loss,
                     }, path1)
         #model.eval()
         #acc = test(train_dataset, test_dataset, model, accuracy_calculator, i)
