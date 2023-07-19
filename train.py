@@ -202,7 +202,6 @@ if __name__ == '__main__':
                         'loss': best_loss,
                     }, path1)
                 path2 = opt.checkpoints_path + opt.backbone + '_s=' + str(s) + '_m=' + str(m) + "batch_size=" + str(opt.train_batch_size) + "loss=" + str(loss.item()) + "_acc=" + str(best_acc) + "_" + str(i) + "fc.pt"
-                torch.save(metric_fc, path2)
         model.eval()
         acc = test(train_dataset, test_dataset, model, accuracy_calculator, i)
 
