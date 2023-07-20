@@ -102,7 +102,6 @@ if __name__ == '__main__':
     elif opt.backbone == 'iresnet34':
         model = get_model("r34",fp16=False)
 
-
     if opt.load_model:
         if opt.backbone == 'resnet18':
             model_dict = model.state_dict()
