@@ -30,7 +30,7 @@ class Config(object):
     test_model_path = 'checkpoints/mobilefacenet_s=72_m=0.2_60.pth'
     save_interval = 10
 
-    train_batch_size = 16  # batch size
+    train_batch_size = 100  # batch size
     test_batch_size = 50
 
     input_shape = (3, 112, 112)
