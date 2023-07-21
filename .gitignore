@@ -7,3 +7,4 @@ data/Datasets/pairs_new_test_VNCeleb_align_frontal_full.txt
 demo.py
 checkpoints/iresnet18_s=64_m=0.2batch_size=16loss=7.678619384765625_acc=0.507778469197262_14pytorch_metric_learning.pt
 checkpoints/iresnet18_s=64_m=0.2batch_size=16loss=7.678619384765625_acc=0.507778469197262_14fc (1).pt
+checkpoints/iresnet34_s=64_m=0.2batch_size=100_10arcface.pt

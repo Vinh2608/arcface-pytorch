@@ -197,7 +197,6 @@ if __name__ == '__main__':
                         'epoch': i,
                         'model_state_dict': model.state_dict(),
                         'optimizer_state_dict': optimizer.state_dict(),
-                        'arcface_head': metric_fc.module.weight
                     }, path1)
         #model.eval()
         #acc = test(train_dataset, test_dataset, model, accuracy_calculator, i)
