@@ -21,7 +21,7 @@ class Config(object):
     test_list = '/content/arcface-pytorch/label_test.txt'
 
     lfw_root = '/content/arcface-pytorch/data/Datasets/VN-celeb_align_frontal_full'
-    lfw_test_list = '/content/arcface-pytorch/data/Datasets/pairs_new_test_VNCeleb_align_frontal.txt'
+    lfw_test_list = '/content/arcface-pytorch/data/Datasets/pairs_new_test_VNCeleb_align_frontal_full.txt'
 
     checkpoints_path = 'checkpoints/'
     checkpoints_optimizer_path = 'checkpoints_optimizer_path/sgd_s=72_m=0.2_60.pth'

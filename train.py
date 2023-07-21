@@ -22,26 +22,26 @@ from pytorch_metric_learning import losses, testers
 from pytorch_metric_learning.utils.accuracy_calculator import AccuracyCalculator
 
 
-def get_all_embeddings(dataset, model):
-    tester = testers.BaseTester()
-    return tester.get_all_embeddings(dataset, model)
+# def get_all_embeddings(dataset, model):
+#     tester = testers.BaseTester()
+#     return tester.get_all_embeddings(dataset, model)
 
-### compute accuracy using AccuracyCalculator from pytorch-metric-learning ###
-def test(train_set, test_set, model, accuracy_calculator, epoch):
-    train_embeddings, train_labels = get_all_embeddings(train_set, model)
-    test_embeddings, test_labels = get_all_embeddings(test_set, model)
-    train_labels = train_labels.squeeze(1)
-    test_labels = test_labels.squeeze(1)
-    print("Computing accuracy")
-    accuracies = accuracy_calculator.get_accuracy(
-        test_embeddings, test_labels, train_embeddings, train_labels, False
-    )
-    print("Test set accuracy at {} (Precision@1) = {}".format(epoch,accuracies["precision_at_1"]))
-    return accuracies
+# ### compute accuracy using AccuracyCalculator from pytorch-metric-learning ###
+# def test(train_set, test_set, model, accuracy_calculator, epoch):
+#     train_embeddings, train_labels = get_all_embeddings(train_set, model)
+#     test_embeddings, test_labels = get_all_embeddings(test_set, model)
+#     train_labels = train_labels.squeeze(1)
+#     test_labels = test_labels.squeeze(1)
+#     print("Computing accuracy")
+#     accuracies = accuracy_calculator.get_accuracy(
+#         test_embeddings, test_labels, train_embeddings, train_labels, False
+#     )
+#     print("Test set accuracy at {} (Precision@1) = {}".format(epoch,accuracies["precision_at_1"]))
+#     return accuracies
 
 if __name__ == '__main__':
     opt = Config()
-    #checkpoint = torch.load(opt.load_model_path)
+    checkpoint = torch.load(opt.load_model_path)
     best_loss =  20 #checkpoint['loss']
     best_acc = 0.1 #checkpoint['acc']
     epoch = 0 #checkpoint['epoch']
@@ -110,9 +110,9 @@ if __name__ == '__main__':
             model_dict.update(pretrained_dict)
             model.load_state_dict(model_dict)
         elif opt.backbone == 'iresnet18':
-            model.load_state_dict(torch.load(opt.load_model_path))
+            model.load_state_dict(torch.load(checkpoint))
         elif opt.backbone == 'iresnet34':
-            model.load_state_dict(torch.load(opt.load_model_path))
+            model.load_state_dict(torch.load(checkpoint))
         else:
             model_dict = model.state_dict()
             pretrained_dict = checkpoint['model_state_dict']
